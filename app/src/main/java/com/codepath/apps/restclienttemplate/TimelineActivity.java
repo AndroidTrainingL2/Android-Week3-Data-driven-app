@@ -1,27 +1,51 @@
 package com.codepath.apps.restclienttemplate;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 
+import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.apps.simpletwitterclient.helpers.EndlessScrollListener;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 
 public class TimelineActivity extends ActionBarActivity {
 
+    private static final int COMPOSE_ACTIVITY_REQUEST_CODE = 0;
     private TwitterClient client;
+    private ArrayList<Tweet> tweets;
+    private TweetsArrayAdapter aTweets;
+    private ListView lvTweets;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
 
+        lvTweets = (ListView) findViewById(R.id.lvTweets);
+        // Create the arraylist (Data source)
+        tweets = new ArrayList<Tweet>();
+        // Construct the adapter from data source
+        aTweets = new TweetsArrayAdapter(this, tweets);
+        // Conect adapter to list view
+        lvTweets.setAdapter(aTweets);
+        lvTweets.setOnScrollListener(new EndlessScrollListener() {
+            public void onLoadMore(int page, int totalItemsCount) {
+                populateTimeline();
+            }
+        });
+        // Get the client
         client = TwitterApplication.getRestClient(); // singleton client
         populateTimeline();
     }
@@ -35,6 +59,8 @@ public class TimelineActivity extends ActionBarActivity {
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 Log.d("legochen", "onSuccess - JsonHttpResponseHandler ");
                 Log.d("legochen", response.toString());
+
+                aTweets.addAll(Tweet.fromJSONArray(response));
             }
 
             // FAILURE
@@ -61,10 +87,21 @@ public class TimelineActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_compose) {
+            Intent intent = new Intent(this, ComposeActivity.class);
+            startActivityForResult(intent, COMPOSE_ACTIVITY_REQUEST_CODE);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            tweets.clear();
+            aTweets.clear();
+            populateTimeline();
+        }
     }
 }

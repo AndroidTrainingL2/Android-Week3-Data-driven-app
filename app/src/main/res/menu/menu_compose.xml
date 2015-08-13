@@ -2,6 +2,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.codepath.apps.restclienttemplate.TimelineActivity">
-    <item android:id="@+id/action_compose" android:title="@string/action_compose"
-        android:icon="@drawable/ic_twitter" app:showAsAction="always" />
+    <item android:id="@+id/action_tweet" android:title="@string/action_tweet"
+        android:icon="@drawable/ic_tweet" app:showAsAction="always" />
 </menu>
