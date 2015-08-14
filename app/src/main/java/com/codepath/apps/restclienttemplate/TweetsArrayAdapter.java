@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.apps.simpletwitterclient.helpers.ParseRelativeDate;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -49,10 +50,7 @@ public class TweetsArrayAdapter extends ArrayAdapter<Tweet> {
         tvUserName.setText(tweet.getUser().getName());
         tvScreenName.setText("@" + tweet.getUser().getName());
         tvBody.setText(tweet.getBody());
-        tvTime.setText(tweet.getCreatedAt());
-        String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
-        SimpleDateFormat sdf = new SimpleDateFormat(twitterFormat, Locale.ENGLISH);
-        Log.i("legochen", sdf.toString());
+        tvTime.setText(ParseRelativeDate.getRelativeTimeAgo(tweet.getCreatedAt()));
         ivProfileImage.setImageResource(android.R.color.transparent); // clear out the old image for a recycled view
         Picasso.with(getContext()).load(tweet.getUser().getProfileImageUrl()).into(ivProfileImage);
         // 5. Return the view to be inserted into the List
